@@ -1,15 +1,21 @@
 import database from 'better-sqlite3'
 import { Express } from 'express'
+import cors from 'cors';
+
 
 
 
 const express = require('express')
 const app = express()
 const port = 4000
+app.use(cors())
 const db = database('./db/setup.db', { verbose: console.log })
 
 const getMuseums = db.prepare(`
 SELECT * FROM museums
+`);
+const getMuseum = db.prepare(`
+SELECT * FROM museums WHERE id =?
 `);
 const getWorksofMuseum = db.prepare(`
 SELECT * FROM works WHERE museId=?
@@ -26,6 +32,10 @@ SELECT * FROM works WHERE id=@id
 const getWorks = db.prepare(`
 SELECT * FROM works
 `);
+const getWork = db.prepare(`
+SELECT * FROM works WHERE id=?
+`);
+
 
 
 app.get('/', (req, res) => {
@@ -76,7 +86,6 @@ app.get("/works/:id", (req, res) => {
     res.send(work);
   } else res.status(404).send({ error: "Work that u searched is not found" });
 });
-
 
 
 app.listen(port, () => {
